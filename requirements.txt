@@ -1,7 +1,10 @@
 pandas
 numpy
 matplotlib
-sklearn
+scikit-learn
 scipy
 seaborn
--e .
+dataclasses
+statsmodels
+
+# -e .
