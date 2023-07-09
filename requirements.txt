@@ -6,5 +6,6 @@ scipy
 seaborn
 dataclasses
 statsmodels
-
+dill
+pickle
 # -e .

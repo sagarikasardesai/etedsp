@@ -9,6 +9,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from src.exception import CustomException
 from src.logger import logging
+from src.utils import save_obj
 
 @dataclass
 class DataTransformationConfig:
@@ -37,7 +38,7 @@ class DataTransformation:
             cat_pipeline = Pipeline(
                 steps = [
                     ("imputer", SimpleImputer(strategy="most_frequent")),
-                    ("onehot", OneHotEncoder(drop_first = True)),
+                    ("onehot", OneHotEncoder()),
                     ("scaler", StandardScaler())
                 ]
             )
@@ -73,10 +74,24 @@ class DataTransformation:
             target_feature_testdf = testdf[target_column]
 
             logging.info(f"Applying the preprocessing object on traindf and testdf.")
+            input_feature_train_arr = preprocessor_obj.fit_transform(input_feature_traindf)
+            input_feature_test_arr = preprocessor_obj.transform(input_feature_testdf)
+            train_arr = np.c_[
+                input_feature_train_arr, np.array(target_feature_traindf)
+            ]
+            test_arr = np.c_[input_feature_test_arr, np.array(target_feature_testdf)]
 
-            
+            logging.info(f"Saved preprocessing object.")
+            save_obj(
+                file_path = self.data_transformation_config.preprocessor_obj_filepath,
+                obj = preprocessor_obj
+            )
 
-
+            return (
+                train_arr,
+                test_arr,
+                self.data_transformation_config.preprocessor_obj_file_path,
+            )
 
         except Exception as e:
             raise CustomException(e, sys)
